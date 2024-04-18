@@ -127,3 +127,29 @@ server.put('/books/:id', async (req, res) => {
   //   });
   // }
 });
+
+server.delete('/books/:id', async (req, res) => {
+  const idBook = req.params.id;
+  const connection = await getDBConnection();
+  const querySQL = 'DELETE FROM books WHERE id_books = ?';
+  const [result] = await connection.query(querySQL, [idBook]);
+
+  console.log(result);
+
+  res.status(200).json({
+    success: true,
+    message: 'Elemento eliminado',
+  });
+
+  // if (result.affectedRows > 0) {
+  //   res.status(200).json({
+  //     success: true,
+  //     message: 'Book deleted!',
+  //   });
+  // } else {
+  //   res.status(400).json({
+  //     success: false,
+  //     message: "The element hasn't been deleted :(",
+  //   });
+  // }
+});
