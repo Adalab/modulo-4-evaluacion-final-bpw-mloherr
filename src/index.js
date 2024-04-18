@@ -90,3 +90,40 @@ server.post('/newbook', async (req, res) => {
     });
   }
 });
+
+server.put('/books/:id', async (req, res) => {
+  const idBook = req.params.id;
+  const newBookData = req.body;
+
+  const { title, summary, author, pages, image, price, genre } = newBookData;
+
+  const connection = await getDBConnection();
+  const querySQL =
+    'UPDATE books SET title = ?, summary = ?, name_author = ?, pages = ?, image = ?, price = ?, fk_genre = ? WHERE id_books = ?';
+  const [result] = await connection.query(querySQL, [
+    title,
+    summary,
+    author,
+    pages,
+    image,
+    price,
+    genre,
+    idBook,
+  ]);
+
+  connection.end();
+  res.status(200).json({
+    success: true,
+  });
+  // if (result.length === 0) {
+  //   res.status(404).json({
+  //     success: false,
+  //     error: "There's not an element with that id",
+  //   });
+  // } else {
+  //   res.status(200).json({
+  //     success: true,
+  //     result: result,
+  //   });
+  // }
+});
