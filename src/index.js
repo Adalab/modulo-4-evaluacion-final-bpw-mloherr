@@ -267,3 +267,6 @@ server.get('/profileuser', authorize, async (req, res) => {
     message: result,
   });
 });
+
+const staticServer = 'src/public-react';
+server.use(express.static(staticServer));
