@@ -1,0 +1,9 @@
+.header {
+    padding: 10px;
+    background: linear-gradient(to bottom, rgb(147, 85, 206), rgb(214, 119, 190));
+
+    &__title {
+        text-align: center;
+        text-decoration: underline;
+    }
+}
