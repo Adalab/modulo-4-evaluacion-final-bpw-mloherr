@@ -168,22 +168,22 @@ server.delete('/books/:id', async (req, res) => {
 
   console.log(result);
 
-  res.status(200).json({
-    success: true,
-    message: 'Elemento eliminado',
-  });
+  // res.status(200).json({
+  //   success: true,
+  //   message: 'Elemento eliminado',
+  // });
 
-  // if (result.affectedRows > 0) {
-  //   res.status(200).json({
-  //     success: true,
-  //     message: 'Book deleted!',
-  //   });
-  // } else {
-  //   res.status(400).json({
-  //     success: false,
-  //     message: "The element hasn't been deleted :(",
-  //   });
-  // }
+  if (result.affectedRows > 0) {
+    res.status(200).json({
+      success: true,
+      message: 'Book deleted!',
+    });
+  } else {
+    res.status(400).json({
+      success: false,
+      message: "The element hasn't been deleted :(",
+    });
+  }
 });
 
 server.post('/signin', async (req, res) => {
@@ -271,5 +271,3 @@ server.get('/profileuser', authorize, async (req, res) => {
     message: result,
   });
 });
-
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJwcnVlYmFAZ21haWwuY29tIiwiaWF0IjoxNzEzNTEzNjE3LCJleHAiOjE3MTM1MTcyMTd9.4hl-0iSW4uwoPSDPZnlsxw3bj2od40amfXAZ82db8TI
