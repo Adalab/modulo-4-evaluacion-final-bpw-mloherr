@@ -39,7 +39,6 @@ const generateToken = (tokenInfo) => {
 
 function authorize(req, res, next) {
   const tokenBearer = req.headers.authorization;
-  console.log('req.headers.middleware:', req.headers.authorization);
   if (!tokenBearer) {
     res.status(401).json({
       success: false,
@@ -167,8 +166,6 @@ server.delete('/books/:id', async (req, res) => {
   const querySQL = 'DELETE FROM books WHERE id_books = ?';
   const [result] = await connection.query(querySQL, [idBook]);
 
-  console.log(result);
-
   if (result.affectedRows > 0) {
     res.status(200).json({
       success: true,
@@ -222,7 +219,7 @@ server.post('/login', async (req, res) => {
 
   const userIsRegistered = userResult.length > 0;
 
-  console.log(userResult);
+  userResult;
 
   if (userIsRegistered) {
     const isSamePassword = await bcrypt.compare(
@@ -236,7 +233,6 @@ server.post('/login', async (req, res) => {
         email: userResult[0].email,
       };
       const token = generateToken(infoToken);
-      console.log('token:', token);
 
       res.status(200).json({
         succes: true,
@@ -257,7 +253,6 @@ server.post('/login', async (req, res) => {
 });
 
 server.get('/profileuser', authorize, async (req, res) => {
-  console.log('userInfoGet:', req.userInfo);
   const connection = await getDBConnection();
   const sqlQueryEmail = 'SELECT * FROM usuarios_db WHERE email = ?';
   const [result] = await connection.query(sqlQueryEmail, [req.userInfo.email]);
