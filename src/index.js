@@ -27,6 +27,13 @@ server.listen(port, () => {
   console.log('Server is running on port ' + port);
 });
 
+const generateToken = (tokenInfo) => {
+  const token = jwt.sign(tokenInfo, 'secret_key_for_readers', {
+    expiresIn: '1h',
+  });
+  return token;
+};
+
 server.get('/books', async (req, res) => {
   const connection = await getDBConnection();
 
@@ -154,4 +161,34 @@ server.delete('/books/:id', async (req, res) => {
   //     message: "The element hasn't been deleted :(",
   //   });
   // }
+});
+
+server.post('/signin', async (req, res) => {
+  const { email, username, password } = req.body;
+
+  const connection = await getDBConnection();
+  const sqlQueryEmail = 'SELECT * FROM usuarios_db WHERE email = ?';
+  const [emailResult] = await connection.query(sqlQueryEmail, [email]);
+
+  if (emailResult.length === 0) {
+    const passwordHashed = await bcrypt.hash(password, 10);
+    const sqlQueryNewUser =
+      'INSERT INTO usuarios_db (email, name_user, password_user) VALUES (?, ?, ?)';
+
+    const [newUserResult] = await connection.query(sqlQueryNewUser, [
+      email,
+      username,
+      passwordHashed,
+    ]);
+
+    res.status(201).json({
+      succes: true,
+      data: newUserResult,
+    });
+  } else {
+    res.status(400).json({
+      succes: false,
+      message: 'Email already registered',
+    });
+  }
 });
