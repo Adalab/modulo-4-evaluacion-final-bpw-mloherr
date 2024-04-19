@@ -192,3 +192,47 @@ server.post('/signin', async (req, res) => {
     });
   }
 });
+
+server.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  const connection = await getDBConnection();
+  const sqlQueryEmail = 'SELECT * FROM usuarios_db WHERE email = ?';
+
+  const [userResult] = await connection.query(sqlQueryEmail, [email]);
+
+  const userIsRegistered = userResult.length > 0;
+
+  console.log(userResult);
+
+  if (userIsRegistered) {
+    const isSamePassword = await bcrypt.compare(
+      password,
+      userResult[0].password_user
+    );
+
+    if (isSamePassword) {
+      const infoToken = {
+        id: userResult[0].id,
+        email: userResult[0].email,
+      };
+      const token = generateToken(infoToken);
+      console.log('token:', token);
+
+      res.status(200).json({
+        succes: true,
+        token: token,
+      });
+    } else {
+      res.status(400).json({
+        succes: false,
+        message: 'Invalid password',
+      });
+    }
+  } else {
+    res.status(400).json({
+      succes: false,
+      message: 'Not user found',
+    });
+  }
+});
