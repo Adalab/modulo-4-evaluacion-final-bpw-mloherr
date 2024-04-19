@@ -3,6 +3,8 @@ const cors = require('cors');
 const mysql = require('mysql2/promise');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('../swagger.json');
 
 require('dotenv').config();
 
@@ -10,6 +12,7 @@ const server = express();
 
 server.use(cors());
 server.use(express.json());
+server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 async function getDBConnection() {
   const connection = await mysql.createConnection({
@@ -144,20 +147,18 @@ server.put('/books/:id', async (req, res) => {
   ]);
 
   connection.end();
-  res.status(200).json({
-    success: true,
-  });
-  // if (result.length === 0) {
-  //   res.status(404).json({
-  //     success: false,
-  //     error: "There's not an element with that id",
-  //   });
-  // } else {
-  //   res.status(200).json({
-  //     success: true,
-  //     result: result,
-  //   });
-  // }
+
+  if (result.affectedRows === 0) {
+    res.status(404).json({
+      success: false,
+      error: "There's not an element with that id",
+    });
+  } else {
+    res.status(200).json({
+      success: true,
+      result: result,
+    });
+  }
 });
 
 server.delete('/books/:id', async (req, res) => {
@@ -167,11 +168,6 @@ server.delete('/books/:id', async (req, res) => {
   const [result] = await connection.query(querySQL, [idBook]);
 
   console.log(result);
-
-  // res.status(200).json({
-  //   success: true,
-  //   message: 'Elemento eliminado',
-  // });
 
   if (result.affectedRows > 0) {
     res.status(200).json({
