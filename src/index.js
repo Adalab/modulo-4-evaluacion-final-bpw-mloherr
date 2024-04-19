@@ -34,6 +34,29 @@ const generateToken = (tokenInfo) => {
   return token;
 };
 
+function authorize(req, res, next) {
+  const tokenBearer = req.headers.authorization;
+  console.log('req.headers.middleware:', req.headers.authorization);
+  if (!tokenBearer) {
+    res.status(401).json({
+      success: false,
+      message: 'Not authenticated',
+    });
+  } else {
+    const token = tokenBearer.split(' ')[1];
+    try {
+      const verifiedToken = jwt.verify(token, 'secret_key_for_readers');
+      req.userInfo = verifiedToken;
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        message: 'Not authenticated',
+      });
+    }
+    next();
+  }
+}
+
 server.get('/books', async (req, res) => {
   const connection = await getDBConnection();
 
@@ -236,3 +259,17 @@ server.post('/login', async (req, res) => {
     });
   }
 });
+
+server.get('/profileuser', authorize, async (req, res) => {
+  console.log('userInfoGet:', req.userInfo);
+  const connection = await getDBConnection();
+  const sqlQueryEmail = 'SELECT * FROM usuarios_db WHERE email = ?';
+  const [result] = await connection.query(sqlQueryEmail, [req.userInfo.email]);
+  connection.end();
+  res.status(200).json({
+    success: true,
+    message: result,
+  });
+});
+
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJwcnVlYmFAZ21haWwuY29tIiwiaWF0IjoxNzEzNTEzNjE3LCJleHAiOjE3MTM1MTcyMTd9.4hl-0iSW4uwoPSDPZnlsxw3bj2od40amfXAZ82db8TI
